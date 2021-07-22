@@ -1,0 +1,18 @@
+{
+	"name": "Galaxia",
+	"admin_email": "inigo.gorosabel@gmail.com",
+	"default_title": "Galaxia",
+	"db": {
+		"host": "localhost",
+		"user": "galaxia",
+		"pass": "J6hx&5y0",
+		"name": "galaxia",
+		"charset": "utf8mb4",
+		"collate": "utf8mb4_unicode_ci"
+	},
+	"log_level": "ALL",
+	"base_url": "https://apigalaxia.osumi.es/",
+	"error_pages": {
+		"404": "/not-found"
+	}
+}
