@@ -8,6 +8,7 @@ use OsumiFramework\OFW\Routing\ORoute;
 use OsumiFramework\App\Service\webService;
 use OsumiFramework\App\Model\Alianza;
 use OsumiFramework\App\Model\Jugador;
+use OsumiFramework\App\Model\Planeta;
 
 #[ORoute(
 	type: 'json',
@@ -222,6 +223,54 @@ class api extends OModule {
 			else {
 				$status = 'error';
 			}
+		}
+
+		$this->getTemplate()->add('status', $status);
+	}
+
+	/**
+	 * Función para guardar un planeta
+	 *
+	 * @param ORequest $req Request object with method, headers, parameters and filters used
+	 * @return void
+	 */
+	#[ORoute('/save-planeta')]
+	public function savePlaneta(ORequest $req): void {
+		$status = 'ok';
+		$id = $req->getParamInt('id');
+		$nombre = $req->getParamString('nombre');
+		$sector = $req->getParamInt('sector');
+		$cuadrante = $req->getParamInt('cuadrante');
+		$ind = $req->getParamInt('ind');
+		$valor = $req->getParamInt('valor');
+		$protegido = $req->getParamBool('protegido');
+		$galaxia = $req->getParam('galaxia');
+		$jugador = $req->getParam('jugador');
+
+		if (is_null($id) || is_null($nombre) || is_null($sector) || is_null($cuadrante) || is_null($ind) || is_null($valor) || is_null($protegido) || is_null($galaxia)) {
+			$status = 'error';
+		}
+
+		if ($status == 'ok') {
+			$planeta = new Planeta();
+			if ($id != -1) {
+				$planeta->find(['id' => $id]);
+			}
+			$planeta->set('id_galaxia', $galaxia['id']);
+			$planeta->set('sector', $sector);
+			$planeta->set('cuadrante', $cuadrante);
+			$planeta->set('ind', $ind);
+			$planeta->set('nombre', $nombre);
+			$planeta->set('valor', $valor);
+			if (!is_null($jugador) && array_key_exists('id', $jugador) && $jugador['id'] != -1) {
+				$planeta->set('id_jugador', $jugador['id']);
+			}
+			else {
+				$planeta->set('id_jugador', null);
+			}
+			$planeta->set('id_especial', null);
+			$planeta->set('protegido', $protegido);
+			$planeta->save();
 		}
 
 		$this->getTemplate()->add('status', $status);
