@@ -9,6 +9,7 @@ use OsumiFramework\App\Service\webService;
 use OsumiFramework\App\Model\Alianza;
 use OsumiFramework\App\Model\Jugador;
 use OsumiFramework\App\Model\Planeta;
+use OsumiFramework\App\Model\Galaxia;
 
 #[ORoute(
 	type: 'json',
@@ -253,7 +254,9 @@ class api extends OModule {
 
 		if ($status == 'ok') {
 			$planeta = new Planeta();
+			$new = true;
 			if ($id != -1) {
+				$new = false;
 				$planeta->find(['id' => $id]);
 			}
 			$planeta->set('id_galaxia', $galaxia['id']);
@@ -271,8 +274,30 @@ class api extends OModule {
 			$planeta->set('id_especial', null);
 			$planeta->set('protegido', $protegido);
 			$planeta->save();
+
+			if ($new) {
+				$galaxia = new Galaxia();
+				$galaxia->find(['id' => $planeta->get('id_galaxia')]);
+				$galaxia->set('investigados', $galaxia->get('investigados') +1);
+				$galaxia->save();
+			}
 		}
 
 		$this->getTemplate()->add('status', $status);
+	}
+
+	/**
+	 * Función para obtener la lista de planetas especiales
+	 *
+	 * @param ORequest $req Request object with method, headers, parameters and filters used
+	 * @return void
+	 */
+	#[ORoute('/get-especiales')]
+	public function getEspeciales(ORequest $req): void {
+		$status = 'ok';
+		$list = $this->web_service->getEspeciales();
+
+		$this->getTemplate()->add('status', $status);
+		$this->getTemplate()->addComponent('list', 'api/especiales_list', ['list' => $list, 'extra' => 'nourlencode']);
 	}
 }

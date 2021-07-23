@@ -10,6 +10,7 @@ use OsumiFramework\App\Model\Planeta;
 use OsumiFramework\App\Model\Alianza;
 use OsumiFramework\App\Model\Raza;
 use OsumiFramework\App\Model\Jugador;
+use OsumiFramework\App\Model\Especial;
 
 class webService extends OService {
 	/**
@@ -165,5 +166,28 @@ class webService extends OService {
 		$db->query($sql, [$jugador->get('id')]);
 
 		$jugador->delete();
+	}
+
+	/**
+	 * Función para obtener la lista completa de planetas especiales
+	 *
+	 * @return array Lista de planetas especiales
+	 */
+	public function getEspeciales(): array {
+		$ret = [];
+		$db = new ODB();
+
+		$sql = "SELECT * FROM `especial` ORDER BY `nombre`";
+		$db->query($sql);
+		$ret = [];
+
+		while ($res = $db->next()) {
+			$especial = new Especial();
+			$especial->update($res);
+
+			array_push($ret, $especial);
+		}
+
+		return $ret;
 	}
 }
