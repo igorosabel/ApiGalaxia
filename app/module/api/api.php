@@ -10,6 +10,7 @@ use OsumiFramework\App\Model\Alianza;
 use OsumiFramework\App\Model\Jugador;
 use OsumiFramework\App\Model\Planeta;
 use OsumiFramework\App\Model\Galaxia;
+use OsumiFramework\App\Model\Especial;
 
 #[ORoute(
 	type: 'json',
@@ -247,6 +248,7 @@ class api extends OModule {
 		$protegido = $req->getParamBool('protegido');
 		$galaxia = $req->getParam('galaxia');
 		$jugador = $req->getParam('jugador');
+		$especial = $req->getParam('especial');
 
 		if (is_null($id) || is_null($nombre) || is_null($sector) || is_null($cuadrante) || is_null($ind) || is_null($valor) || is_null($protegido) || is_null($galaxia)) {
 			$status = 'error';
@@ -271,7 +273,12 @@ class api extends OModule {
 			else {
 				$planeta->set('id_jugador', null);
 			}
-			$planeta->set('id_especial', null);
+			if (!is_null($especial) && array_key_exists('id', $especial) && $especial['id'] != -1) {
+				$planeta->set('id_especial', $especial['id']);
+			}
+			else {
+				$planeta->set('id_especial', null);
+			}
 			$planeta->set('protegido', $protegido);
 			$planeta->save();
 
@@ -299,5 +306,66 @@ class api extends OModule {
 
 		$this->getTemplate()->add('status', $status);
 		$this->getTemplate()->addComponent('list', 'api/especiales_list', ['list' => $list, 'extra' => 'nourlencode']);
+	}
+
+	/**
+	 * Función para guardar un especial
+	 *
+	 * @param ORequest $req Request object with method, headers, parameters and filters used
+	 * @return void
+	 */
+	#[ORoute('/save-especial')]
+	public function saveEspecial(ORequest $req): void {
+		$status = 'ok';
+		$id = $req->getParamInt('id');
+		$nombre = $req->getParamString('nombre');
+		$img = $req->getParamString('img');
+
+		if (is_null($id) || is_null($nombre) || is_null($img)) {
+			$status = 'error';
+		}
+
+		if ($status == 'ok') {
+			$especial = new Especial();
+			if ($id != -1) {
+				$especial->find(['id' => $id]);
+			}
+			$especial->set('nombre', $nombre);
+			$especial->save();
+
+			if (stripos($img, 'data') !== false) {
+				$this->web_service->saveNewImage($img, $especial->get('id'));
+			}
+		}
+
+		$this->getTemplate()->add('status', $status);
+	}
+
+	/**
+	 * Función para borrar un especial
+	 *
+	 * @param ORequest $req Request object with method, headers, parameters and filters used
+	 * @return void
+	 */
+	#[ORoute('/delete-especial')]
+	public function deleteEspecial(ORequest $req): void {
+		$status = 'ok';
+		$id = $req->getParamInt('id');
+
+		if (is_null($id)) {
+			$status = 'error';
+		}
+
+		if ($status == 'ok') {
+			$especial = new Especial();
+			if ($especial->find(['id' => $id])) {
+				$this->web_service->deleteEspecial($especial);
+			}
+			else {
+				$status = 'error';
+			}
+		}
+
+		$this->getTemplate()->add('status', $status);
 	}
 }

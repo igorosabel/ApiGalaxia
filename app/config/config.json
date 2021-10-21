@@ -14,5 +14,8 @@
 	"base_url": "https://apigalaxia.osumi.es/",
 	"error_pages": {
 		"404": "/not-found"
+	},
+	"extra": {
+		"photo": "/var/www/vhosts/osumi.es/apigalaxia.osumi.es/web/especiales/"
 	}
 }

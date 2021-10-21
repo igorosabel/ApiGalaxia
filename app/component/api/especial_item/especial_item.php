@@ -3,6 +3,7 @@ null
 <?php else: ?>
 {
   "id": <?php echo $values['especial']->get('id') ?>,
-	"nombre": <?php echo urlencode($values['especial']->get('nombre')) ?>
+	"nombre": "<?php echo urlencode($values['especial']->get('nombre')) ?>",
+  "img": "<?php echo $values['especial']->getUrl() ?>"
 }
 <?php endif ?>
